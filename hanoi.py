@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 __author__ = "Step"
+import msvcrt
 import collections
 import os
 import sys
@@ -64,9 +65,11 @@ class Pole(object):
         return "\n".join(lines)
 
 class Hanoi(object):
-    def __init__(self, numOfPoles, numOfRings):
+    def __init__(self, numOfRings, numOfPoles=3):
         heightOfPole = numOfRings + 2
         widthOfPole = numOfRings * 2 + 1
+        self.__frames__ = []
+        self.__numOfRings__ = numOfRings
         #noinspection PyUnusedLocal
         self.__poles__ = [Pole(heightOfPole, widthOfPole) for i in xrange(numOfPoles)]
         for i in reversed(xrange(numOfRings)):
@@ -78,30 +81,44 @@ class Hanoi(object):
         poles = [reduce(lambda x, y: "{0} {1}".format(x, y), pole) for pole in poles]
         return "\n".join(poles)
 
-    def move(self, source, destination, show=None):
-        if show is None:
-            show = False
+    def move(self, source, destination):
         ring = self.__poles__[source].pullRing()
         self.__poles__[destination].placeRing(ring)
-        if show:
-            os.system("cls")
-            print self
 
-    def solve(self, n, source, destination, buf):
+        return "{0}\n\nRing moved from pole {1} to pole {2}".format(str(self), str(source + 1), str(destination + 1))
+
+    def genSolveAnimation(self, n, source, destination, buf):
         if n:
-            self.solve(n - 1, source, buf, destination)
-            sleep(0.2)
-            self.move(source, destination, True)
-            sleep(0.2)
-            self.solve(n - 1, buf, destination, source)
+            self.genSolveAnimation(n - 1, source, buf, destination)
+            self.__frames__.append(self.move(source, destination))
+            self.genSolveAnimation(n - 1, buf, destination, source)
 
-if len(sys.argv) > 1:
-    towers = Hanoi(3, int(sys.argv[1]))
-    os.system("cls")
-    print towers
-    towers.solve(int(sys.argv[1]), 0, 2, 1)
-else:
-    towers = Hanoi(3, 5)
-    os.system("cls")
-    print towers
-    towers.solve(5, 0, 2, 1)
+    def playSolveAnimation(self, auto=None):
+        if auto is None:
+            auto = False
+        if self.__frames__:
+            frame = 0
+            if auto:
+                for frame in self.__frames__:
+                    print frame
+                    sleep(0.3)
+                    os.system("cls")
+            else:
+                while -1 < frame < 2 ** self.__numOfRings__:
+                    os.system("cls")
+                    print self.__frames__[frame]
+                    code = msvcrt.getch()
+                    while code not in ("a", "d"):
+                        code = msvcrt.getch()   
+                    if code == "a":
+                        frame -= 1
+                    else:
+                        frame += 1
+        else:
+            self.__frames__.append("{0}\n\nStarting move".format(str(self)))
+            self.genSolveAnimation(self.__numOfRings__, 0, 2, 1)
+            self.playSolveAnimation(auto)
+
+towers = Hanoi(5)
+# print towers.move(0, 1)
+towers.playSolveAnimation()
