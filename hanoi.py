@@ -21,11 +21,23 @@ class Animation(object):
             for frame in self._framebuffer__:
                 os.system("cls")
                 print frame
-                sleep(0.02)
+                sleep(0.01)
         else:
             os.system("cls")
             print self._framebuffer__
             sleep(0.15)
+
+    def rewind(self):
+        if self.__multiframe__:
+            for frame in reversed(self._framebuffer__):
+                os.system("cls")
+                print frame
+                sleep(0.01)
+        else:
+            os.system("cls")
+            print self._framebuffer__
+            sleep(0.15)
+
 
     def isEmpty(self):
         return bool(self._framebuffer__)
@@ -128,8 +140,10 @@ class Hanoi(object):
         return "{0}\n\nRing moved from pole {1} to pole {2}".format(str(self), str(source + 1), str(destination + 1))
 
     def animatedMove(self, source, destination):
-        ring = self._poles__[source].pullRing()
         holder = Animation()
+        holder.addFrame(str(self))
+        ring = self._poles__[source].pullRing()
+        
         while self._poles__[source].freeSpace() > 1:
             self._poles__[source].placeRing(InvisibleRing())
             self._poles__[source].placeRing(ring)
@@ -160,7 +174,7 @@ class Hanoi(object):
             self.__animationHolder__.append(self.animatedMove(source, destination))
             self.genSolveAnimation(n - 1, buf, destination, source)
 
-    def playSolveAnimation(self, auto=None, delay=0.3):
+    def playSolveAnimation(self, auto=None):
         if auto is None:
             auto = True
         if self.__animationHolder__:
@@ -169,22 +183,28 @@ class Hanoi(object):
                     animation.play()
             else:
                 index = 0
-                while -1 < index < 2 ** self.__numOfRings__ - 1:
-                    self.__animationHolder__[index].play()
+                direction = 1
+                while -1 < (index % 2 ** self.__numOfRings__) < 2 ** self.__numOfRings__ - 1:
+                    if direction == 1:
+                        self.__animationHolder__[index].play()
+                        index += 1
+                    elif direction == -1:
+                        index -= 1
+                        self.__animationHolder__[index].rewind()
                     code = msvcrt.getch()
                     while code not in ("a", "d"):
                         code = msvcrt.getch()   
                     if code == "a":
-                        index -= 1
+                        direction = -1
                     else:
-                        index += 1
+                        direction = 1
         else:
             self.genSolveAnimation(self.__numOfRings__, 0, 2, 1)
-            self.playSolveAnimation(auto, delay)
+            self.playSolveAnimation(auto)
 
 if len(sys.argv) > 1:
     tower = Hanoi(int(sys.argv[1]))
-    tower.playSolveAnimation()
+    tower.playSolveAnimation(False)
 else:
     towers = Hanoi(4)
     towers.playSolveAnimation()
