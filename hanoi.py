@@ -48,7 +48,7 @@ class Animation(object):
             os.system("cls")
             print self._framebuffer__
             if self.__start__:
-                print "\n\nReturning to the initial position."
+                print "\n\nReturned to the initial position."
             else:
                 print "\n\nReturning ring back from {1} to {0}.".format(self.__from__, self.__to__)
             sleep(self.__delay__)
@@ -203,14 +203,16 @@ class Hanoi(object):
             while -1 < (index % 2 ** self.__numOfRings__) < 2 ** self.__numOfRings__:
                 if direction == 1:
                     self.__animationHolder__[index].play()
+                    print "Press 'a' and 'd' to move, 'q' to stop."
                     index += 1
                     index %= 2 ** self.__numOfRings__ - 1
                 elif direction == -1:
                     index -= 1
                     index %= 2 ** self.__numOfRings__ - 1
                     self.__animationHolder__[index].rewind()
+                    print "Press 'a' and 'd' to move, 'q' to stop."
                 code = msvcrt.getch()
-                while code not in ("a", "d"):
+                while code not in ("a", "d", "q"):
                     code = msvcrt.getch()   
                 if code == "a":
                     direction = -1
@@ -219,9 +221,23 @@ class Hanoi(object):
                 elif code == "q":
                     break
 
-if len(sys.argv) > 1:
-    tower = Hanoi(int(sys.argv[1]))
-    tower.playSolveAnimation(False)
-else:
-    towers = Hanoi(4)
-    towers.playSolveAnimation()
+def main():
+    ringsCount = 0
+    try:
+        ringsCount = int(raw_input("\nRings count: "))
+    except ValueError:
+        print "Don't try to fool me."
+        exit()
+    print "\nPress any key to control movements.\nIf you press Enter it will be done automatically."
+    key = msvcrt.getch()
+    auto = (ord(key) == 13)
+    towers = Hanoi(ringsCount)
+    towers.playSolveAnimation(auto)
+    if raw_input("Do you want to exit? (y/[n]): ") == "y":
+        return False
+    return True
+
+if __name__ == "__main__":
+    reRun = main()
+    if reRun:
+        main()
