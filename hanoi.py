@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 __author__ = "Step"
-import sys
 import msvcrt
 import os
 from time import sleep
@@ -57,6 +56,7 @@ class Animation(object):
     def isEmpty(self):
         return bool(self._framebuffer__)
 
+
 class Ring(object):
     def __init__(self, size):
         self.__size__ = size
@@ -74,6 +74,7 @@ class Ring(object):
 
         return self.__size__ < other.__size__
 
+
 class InvisibleRing(Ring):
     def __init__(self):
         super(InvisibleRing, self).__init__(0)
@@ -83,6 +84,7 @@ class InvisibleRing(Ring):
 
     def __gt__(self, other):
         return True
+
 
 class Pole(object):
     def __init__(self, height, width):
@@ -117,7 +119,7 @@ class Pole(object):
             if isinstance(self._rings__[i], InvisibleRing):
                 del self._rings__[i]
                 break
-        else: 
+        else:
             return False
         return True
 
@@ -130,6 +132,7 @@ class Pole(object):
             lines.append(str(ring).center(self.__width__))
 
         return "\n".join(lines)
+
 
 class Hanoi(object):
     def __init__(self, numOfRings, numOfPoles=3, multiframe=True):
@@ -160,7 +163,7 @@ class Hanoi(object):
         holder = Animation(from_=source, to=destination)
         holder.addFrame(str(self))
         ring = self._poles__[source].pullRing()
-        
+
         while self._poles__[source].freeSpace() > 1:
             self._poles__[source].placeRing(InvisibleRing())
             self._poles__[source].placeRing(ring)
@@ -213,13 +216,14 @@ class Hanoi(object):
                     print "Press 'a' and 'd' to move, 'q' to stop."
                 code = msvcrt.getch()
                 while code not in ("a", "d", "q"):
-                    code = msvcrt.getch()   
+                    code = msvcrt.getch()
                 if code == "a":
                     direction = -1
                 elif code == "d":
                     direction = 1
                 elif code == "q":
                     break
+
 
 def main():
     ringsCount = 0
